@@ -1,0 +1,17 @@
+
+The LaCrosse 2300 series has a nasty bug where it seems to read 114mph when it 
+(too frequently) loses wireless synch with the outside sensors.  This causes
+many errors in historical hi/low, noaa reports, etc.
+
+To find these records:
+
+echo "SELECT * FROM archive WHERE (windSpeed > 112);" | sqlite3 mydb.sdb
+echo "SELECT * FROM archive WHERE (windGust  > 112);" | sqlite3 mydb.sdb
+
+To null out these fields:
+
+echo "UPDATE archive SET windSpeed=0 WHERE (windSpeed > 112);" | sqlite3 mydb.sdb
+echo "UPDATE archive SET windGust=0  WHERE (windGust  > 112);" | sqlite3 mydb.sdb
+
+
+==> as always, work off a temporary copy of your db just in case
