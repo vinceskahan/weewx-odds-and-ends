@@ -2,7 +2,8 @@
 
 ######Get the last 20 records from the archive, for rain info only, most recent first:
 
-    echo "select datetime(dateTime,'unixepoch','localtime'),dateTime,rain,rainRate from archive order by rowid desc limit 20;",
+    echo "select datetime(dateTime,'unixepoch','localtime'),dateTime,rain,rainRate 
+       from archive order by rowid desc limit 20;" | sqlite3 weewx.sdb
 
 From this, get the dateTime value of the most recent one, which is seconds
   since the epoch.  The localtime representation is there to hopefully make this a little easier.
