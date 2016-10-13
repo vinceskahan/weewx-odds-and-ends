@@ -1,0 +1,9 @@
+VER="3.6.1"
+
+wget http://www.weewx.com/downloads/${VER}.tar.gz
+tar zxvf ${VER}.tar.gz
+cd weewx-${VER}
+python setup.py build
+python setup.py install
+service weewx stop
+service weewx start
