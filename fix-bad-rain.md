@@ -10,8 +10,9 @@
 From this, get the dateTime value of the most recent one, which is seconds
   since the epoch.  The localtime representation is there to hopefully make this a little easier.
 
-Note: this prints in 'newest at the top' reverse order, so be careful in the next step.
-
+Note: this prints in 'newest at the top' reverse order, so be careful in the next step.  See the 'desc(ending)' ?
+  To print ascending order change 'desc' above to 'asc'.
+  
 #### Set the rain to 0.01 inches for times in-between two times
 
     echo "update archive set rain=0.01 where dateTime<=1476343000 and dateTime>=1476342000;" |
