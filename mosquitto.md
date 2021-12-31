@@ -1,6 +1,9 @@
 
 This is a known good config file for mosquitto MQTT
-since it comes up so often on weewx-user
+since it comes up so often on weewx-user.
+
+ref: https://projects.eclipse.org/projects/iot.mosquitto/releases/2.0
+
 
 ````
 #-----------------------------------------------------------
