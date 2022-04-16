@@ -23,13 +23,39 @@ exit
 exit
 exit
 
-#-------------------------------------
+#---------------------------------------------------------
+# configure mosquitto MQTT server
+#---------------------------------------------------------
+
+#----- /etc/mosquitto/conf.d/9001.conf ---
+listener 9001
+protocol websockets
+
+#----- /etc/mosquitto/conf.d/1883.conf ---
+listener 1883
+allow_anonymous true
+
+# or use a simple username/password pair
+#   remember to make a password file entry for the user
+#       mosquitto_passwd -c /etc/mosquitto/pwfile myuser
+#       (and enter the mosquitto password for that user twice)
+#
+#   to subscribe - remember to provide the user and pass you created
+#   ala:
+#      mosquitto_sub -t mytopic -h myaddress -u myuser -P mypass
+# 
+#  listener 1883
+#  allow_anonymous false
+#  password_file /etc/mosquitto/pwfile
+
+
+#------------------------------------------------------------------
 # minimal weewx.conf edits below here
 # to get realtime websockets running
 #
 # this assumes a functional MQTT
 # broker and no passwords or ssl there
-#-------------------------------------
+#------------------------------------------------------------------
 
 debug = 1
 
@@ -37,12 +63,12 @@ debug = 1
 
      [[MQTT]]
         server_url = mqtt://192.168.1.232:1883/
- 	aggregation = aggregate
+        aggregation = aggregate
         topic = simulator
         unit_system = US
         binding = loop,archive
- 	log_success = false
- 	log_failure = true
+        log_success = false
+        log_failure = true
 
 [StdReport]
 
