@@ -1,0 +1,10 @@
+
+Noticed a console message on the VP2 saying the battery was low.  The example graph here shows that weewx 'did' detect it and graph it.
+
+Fixed the issue by:
+  - entered setup on the console (hold Done and down-arrow down)
+  - replaced the CR123 on the ISS
+  - hold done for a few seconds to exit setup
+  - waited for the console to reestablish comms with the ISS in a couple minutes
+
+
