@@ -1,87 +1,138 @@
-
-
-#---------------------
-# install Belchertown
-#---------------------
-
-cd /var/tmp
-
-wget https://github.com/poblabs/weewx-belchertown/archive/refs/heads/master.zip -O Belch.zip
-wee_extension --install Belch.zip 
-
-wget -O weewx-mqtt.zip https://github.com/matthewwall/weewx-mqtt/archive/master.zip
-wee_extension --install weewx-mqtt.zip 
-
-apt install python3-paho-mqtt
-
-# edit weewx
-
-systemctl restart weewx
-
-
-exit
-exit
-exit
-
-#---------------------------------------------------------
-# configure mosquitto MQTT server
-#---------------------------------------------------------
-
-#----- /etc/mosquitto/conf.d/9001.conf ---
-listener 9001
-protocol websockets
-
-#----- /etc/mosquitto/conf.d/1883.conf ---
-listener 1883
-allow_anonymous true
-
-# or use a simple username/password pair
-#   remember to make a password file entry for the user
-#       mosquitto_passwd -c /etc/mosquitto/pwfile myuser
-#       (and enter the mosquitto password for that user twice)
+#####################################################################
 #
-#   to subscribe - remember to provide the user and pass you created
-#   ala:
-#      mosquitto_sub -t mytopic -h myaddress -u myuser -P mypass
-# 
-#  listener 1883
-#  allow_anonymous false
-#  password_file /etc/mosquitto/pwfile
-
-
-#------------------------------------------------------------------
-# minimal weewx.conf edits below here
-# to get realtime websockets running
+# v5 pip installation of weewx, belchertown, and websockets
 #
-# this assumes a functional MQTT
-# broker and no passwords or ssl there
-#------------------------------------------------------------------
+# for a new installation of v5 weewx in pip --user mode
+# you will have to run it once and let it complain and fail
+# then log out/in for $PATH to pick up $HOME/.local/bin
+# but it is safe to run this script multiple times
+#
+#####################################################################
 
-debug = 1
+# install weewx v5 in --user mode and start it up
+pip3 install weewx --user
+weectl station configure --no-prompt
+cd ~/weewx-data
+sudo cp util/systemd/weewx.service /etc/systemd/system
+sudo systemctl daemon-reload
+sudo systemctl enable weewx
+sudo systemctl start weewx
 
-[StdRESTful]
+# install Belchertown skin
+# - an immediate  manual wee_reports will fail if the weewx db has no records in it
+#   because Belchertown can't deal with an empty db at this time
+#   so just wait 5 minutes for the initial archive period to populate the db
+wget https://github.com/poblabs/weewx-belchertown/archive/refs/heads/master.zip -O /var/tmp/weewx-belchertown.zip
+weectl extension install /var/tmp/weewx-belchertown.zip 
 
-     [[MQTT]]
-        server_url = mqtt://192.168.1.232:1883/
-        aggregation = aggregate
-        topic = simulator
-        unit_system = US
-        binding = loop,archive
-        log_success = false
-        log_failure = true
+# install weewx MQTT publishing extension
+wget https://github.com/matthewwall/weewx-mqtt/archive/master.zip -O /var/tmp/weewx-mqtt.zip
+weectl extension install /var/tmp/weewx-mqtt.zip 
 
-[StdReport]
+# install python lib for MQTT
+sudo apt-get install -y python3-paho-mqtt
 
-     [[Belchertown]]
-         skin = Belchertown
-         HTML_ROOT = /var/www/html/weewx/belchertown
-         enable = true
-         
-         [[[Extras]]]
-             mqtt_websockets_enabled = 1
-             mqtt_websockets_host = 192.168.1.232
-             mqtt_websockets_port = 9001
-             mqtt_websockets_ssl = 0
-             mqtt_websockets_topic = "simulator/loop"
-             disconnect_live_website_visitor = 1800000
-             
+# install mosquitto broker
+sudo apt-get install -y mosquitto
+
+# install for diagnostics
+sudo apt-get install -y mosquitto-clients sqlite3
+
+# install nginx webserver
+sudo apt-get install -y nginx
+
+# note the v5 pip --user path here for weewx's doc root assuming a /home/pi user
+# edit accordingly forlegacy setup.py or packaged installations of weewx
+sudo ln -s /home/pi/weewx-data/public_html/ /var/www/html/weewx
+
+
+########################################################################
+# MANUAL CONFIGURATION IS NEEDED TO FINISH THE INSTALLATION
+########################################################################
+#
+# create a new /etc/mosquitto/conf.d/local.conf per the example below
+#
+# hand-edit weewx.conf per the example below
+#
+# sudo systemctl restart weewx
+#
+# connect to the http://ip_address/weewx/belchertown URL
+#    and websockets should show connected ok
+#
+########################################################################
+
+exit
+exit
+exit
+exit
+
+# everything below here is template config file entries
+# to hand-edit into place....
+
+#-- ############################################################
+#-- #
+#-- # create a new mosquitto config file 
+#-- #       /etc/mosquitto/conf.d/local.conf
+#-- #
+#-- # then sudo systemctl restart mosquitto
+#-- # and  sudo systemctl restart weewx
+#-- #
+#-- ############################################################
+#-- 
+#-- listener 9001
+#-- protocol websockets
+#-- 
+#-- listener 1883
+#-- allow_anonymous true
+#-- 
+#-- # or use a simple username/password pair
+#-- #   remember to make a password file entry for the user
+#-- #       mosquitto_passwd -c /etc/mosquitto/pwfile myuser
+#-- #       (and enter the mosquitto password for that user twice)
+#-- #
+#-- #   to subscribe - remember to provide the user and pass you created
+#-- #   ala:
+#-- #      mosquitto_sub -t mytopic -h myaddress -u myuser -P mypass
+#-- # 
+#-- #  listener 1883
+#-- #  allow_anonymous false
+#-- #  password_file /etc/mosquitto/pwfile
+#-- #
+#-- ########################################################
+
+#-- ########################################################
+#-- #
+#-- # minimal weewx.conf edits for Belchertown websockets
+#-- # note this example has no username or password for MQTT
+#-- # and assumes the mosquitto broker is on 192.168.1.232
+#-- #
+#-- ########################################################
+#-- 
+#-- [StdRESTful]
+#-- 
+#--      [[MQTT]]
+#--         server_url = mqtt://192.168.1.232:1883/
+#--         aggregation = aggregate
+#--         topic = simulator
+#--         unit_system = US
+#--         binding = loop,archive
+#--         log_success = false
+#--         log_failure = true
+#-- 
+#-- [StdReport]
+#-- 
+#--      [[Belchertown]]
+#--          skin = Belchertown
+#--          HTML_ROOT = /var/www/html/weewx/belchertown
+#--          enable = true
+#--          
+#--          [[[Extras]]]
+#--              mqtt_websockets_enabled = 1
+#--              mqtt_websockets_host = 192.168.1.232
+#--              mqtt_websockets_port = 9001
+#--              mqtt_websockets_ssl = 0
+#--              mqtt_websockets_topic = "simulator/loop"
+#--              disconnect_live_website_visitor = 1800000
+#-- 
+#-- ########################################################
+
