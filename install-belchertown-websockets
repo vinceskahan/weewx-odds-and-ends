@@ -111,7 +111,8 @@ exit
 #-- [StdRESTful]
 #-- 
 #--      [[MQTT]]
-#--         server_url = mqtt://192.168.1.232:1883/
+#--         server_url = mqtt://192.168.1.232:1883/                                     # if MQTT permits anonymous
+#--         #### server_url = mqtt://weewxMQTTuser:weewxMQTTpass@192.168.1.232:1883/    # if MQTT is password protected
 #--         aggregation = aggregate
 #--         topic = simulator
 #--         unit_system = US
@@ -133,6 +134,8 @@ exit
 #--              mqtt_websockets_ssl = 0
 #--              mqtt_websockets_topic = "simulator/loop"
 #--              disconnect_live_website_visitor = 1800000
+#--              # mqtt_username = "weewxMQTTuser"               # if MQTT is password protected
+#--              # mqtt_password = "weewxMQTTpass"               # if MQTT is password protected
 #-- 
 #-- ########################################################
 
