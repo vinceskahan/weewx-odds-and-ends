@@ -2,7 +2,7 @@
 
 # Installing a driver, skin, or extension
 
-The WeeWX extension installer can be used to install, uninstall, and list properly constructted WeeWX drivers, extensions or skins.   Each such item might require subsequent edits to weewx.conf or to the skin's skin.conf file.  Consult the particular item's documentation for details.
+The WeeWX extension installer can be used to install, uninstall, and list properly constructed WeeWX drivers, extensions or skins.   Each such item might require subsequent edits to weewx.conf or to the skin's skin.conf file.  Consult the particular item's documentation for details.
 
 This example installs a demonstration skin, but the command syntax is identical for drivers and extensions.
 
