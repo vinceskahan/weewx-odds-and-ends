@@ -30,9 +30,9 @@ pip3 install weewx --quiet 2>/dev/null
 weectl station create --config=${TEST_DIR}/weetest-data/weewx.conf --no-prompt >/dev/null
 
 echo "... downloading and extracting benchmark code ..."
-wget -qO- ${BENCHMARK_TGZ} | tar xz -C /var/tmp
+wget -qO- ${BENCHMARK_DIR} | tar xz -C /var/tmp
 
-if [ -d ${BENCHMARK_TGZ}/public_html ]
+if [ -d ${BENCHMARK_DIR}/public_html ]
 then
   echo "... cleaning up previous benchmark runs ..."
   rm -r ${BENCHMARK_TGZ}/public_html
