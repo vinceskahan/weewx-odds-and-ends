@@ -37,19 +37,6 @@ then
   rm -r ${BENCHMARK_DIR}/public_html
 fi
 
-echo "... appending stdout logging to weewx.conf ..."
-cat >>${BENCHMARK_DIR}/weewx.conf <<-EOF
-[Logging]
-    version = 1
-    disable_existing_loggers = True
-
-    [[loggers]]
-        [[[weewx.cheetahgenerator]]]
-          handlers = console,
-        [[[weewx.imagegenerator]]]
-          handlers = console,
-EOF
-
 echo "... running the weewx benchmark ..."
 wee_reports ${BENCHMARK_DIR}/weewx.conf
 
