@@ -15,8 +15,11 @@ BENCHMARK_DIR="/var/tmp/weewx-benchmark"
 
 #---- stop editing here ---
 #
-# we also send weectl and wee_reports output to /dev/null
-# because there is no --quiet option to those commands
+# we send weectl output to /dev/null
+# because there is no --quiet option
+#
+# similarly we send pip error output to /dev/null
+# to suppress deprecation warnings
 
 echo "... installing weewx to a test directory ..."
 mkdir ${TEST_DIR}
