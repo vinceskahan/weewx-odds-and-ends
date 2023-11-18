@@ -28,8 +28,10 @@ python3 -m venv weetest-venv
 source weetest-venv/bin/activate
 pip3 install weewx --quiet 2>/dev/null
 
+# if Tom uses mac tar it can add things to the tarball
+# ref: https://superuser.com/questions/318809/linux-os-x-tar-incompatibility-tarballs-created-on-os-x-give-errors-when-unt
 echo "... downloading and extracting benchmark code ..."
-wget -qO- ${BENCHMARK_TGZ} | tar xz -C /var/tmp
+wget -qO- ${BENCHMARK_TGZ} | tar xz --warning=no-unknown-keyword -C /var/tmp
 
 if [ -d ${BENCHMARK_DIR}/public_html ]
 then
