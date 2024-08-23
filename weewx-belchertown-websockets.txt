@@ -1,0 +1,130 @@
+
+#-------------------------------------------------------
+# From the weewx log
+#-------------------------------------------------------
+2024-08-08T19:55:17.387146-07:00 raspberrypi weewxd[4222]: DEBUG weewx.manager: Daily summary version is 4.0
+2024-08-08T19:55:17.876041-07:00 raspberrypi weewxd[4222]: INFO weewx.restx: MQTT: Published record 2024-08-08 19:55:18 PDT (1723172118)
+2024-08-08T19:55:18.294317-07:00 raspberrypi weewxd[4222]: INFO weewx.cheetahgenerator: Generated 12 files for report Belchertown in 0.92 seconds
+2024-08-08T19:55:18.307852-07:00 raspberrypi weewxd[4222]: INFO weewx.reportengine: Copied 3 files to /home/pi/weewx-data/public_html/belchertown
+2024-08-08T19:55:18.324487-07:00 raspberrypi weewxd[4222]: DEBUG weewx.manager: Daily summary version is 4.0
+2024-08-08T19:55:18.487352-07:00 raspberrypi weewxd[4222]: DEBUG weewx.reportengine: Report 'FTP' not enabled. Skipping.
+2024-08-08T19:55:18.487690-07:00 raspberrypi weewxd[4222]: DEBUG weewx.reportengine: Report 'RSYNC' not enabled. Skipping.
+2024-08-08T19:55:20.375037-07:00 raspberrypi weewxd[4222]: INFO weewx.restx: MQTT: Published record 2024-08-08 19:55:20 PDT (1723172120)
+2024-08-08T19:55:22.874986-07:00 raspberrypi weewxd[4222]: INFO weewx.restx: MQTT: Published record 2024-08-08 19:55:23 PDT (1723172123)
+2024-08-08T19:55:25.375017-07:00 raspberrypi weewxd[4222]: INFO weewx.restx: MQTT: Published record 2024-08-08 19:55:25 PDT (1723172125)
+
+#-------------------------------------------------------
+# Example mosquitto log
+#-------------------------------------------------------
+1723168752: mosquitto version 2.0.11 starting
+1723168752: Config loaded from /etc/mosquitto/mosquitto.conf.
+1723168752: Starting in local only mode. Connections will only be possible from clients running on this machine.
+1723168752: Create a configuration file which defines a listener to allow remote access.
+1723168752: For more details see https://mosquitto.org/documentation/authentication-methods/
+1723168752: Opening ipv4 listen socket on port 1883.
+1723168752: Opening ipv6 listen socket on port 1883.
+1723168801: mosquitto version 2.0.11 running
+1723170602: Saving in-memory database to /var/lib/mosquitto//mosquitto.db.
+1723170686: New connection from 192.168.1.232:56773 on port 1883.
+1723170686: New client connected from 192.168.1.232:56773 as weewx_784a909c (p2, c1, k60).
+1723170915: Client weewx_784a909c closed its connection.
+1723171692: New connection from 192.168.1.232:51645 on port 1883.
+1723171692: New client connected from 192.168.1.232:51645 as weewx_b396e0df (p2, c1, k60).
+1723171834: New client connected from ::ffff:192.168.1.51:54402 as website522586962 (p2, c1, k60).
+1723172225: Client weewx_b396e0df closed its connection.
+1723172228: New connection from 192.168.1.232:54439 on port 1883.
+1723172228: New client connected from 192.168.1.232:54439 as weewx_2d9b84ff (p2, c1, k60).
+1723172403: Saving in-memory database to /var/lib/mosquitto//mosquitto.db.
+
+
+#-------------------------------------------------------
+# weewx.conf snippets for Belchertown websockets
+#-------------------------------------------------------
+
+[StdRESTful]
+
+    [[MQTT]]
+        server_url = mqtt://192.168.1.232:1883/
+        topic = simulator
+        unit_system = US
+
+        binding = archive, loop
+        aggregation = aggregate
+        enable = true
+        log_success = true     # NOTE: THIS IS VERY CHATTY
+        log_failure = true
+
+
+[StdReport]
+
+    [[Belchertown]]
+        skin = Belchertown
+        HTML_ROOT = public_html/belchertown
+
+        enable = true
+
+        [[[Extras]]]
+
+            #--- MQTT Websockets (for Real Time Streaming) Options ---
+            mqtt_websockets_enabled = 1
+            mqtt_websockets_host = 192.168.1.232
+
+            mqtt_websockets_port = 9001
+            mqtt_websockets_ssl = 0
+            mqtt_websockets_topic = simulator/loop
+            disconnect_live_website_visitor = 1800000
+
+#---------------------------------------------------------
+# /etc/mosquitto/conf.d/local.conf for minimal websockets
+#---------------------------------------------------------
+
+listener 9001
+protocol websockets
+
+listener 1883
+allow_anonymous true
+
+#---------------------------------------------------------
+# weectl extension list
+#---------------------------------------------------------
+
+Extension Name    Version   Description
+Belchertown       1.3.1     A clean modern skin with real time streaming updates and interactive charts. Modeled after BelchertownWeather.com
+mqtt              0.24      Upload weather data to MQTT server.
+
+#---------------------------------------------------------
+# venv pip3 list
+#---------------------------------------------------------
+
+Package    Version
+---------- -----------
+configobj  5.0.8
+CT3        3.3.3.post1
+ephem      4.1.5
+paho-mqtt  2.1.0
+pillow     10.4.0
+pip        23.0.1
+PyMySQL    1.1.1
+pyserial   3.5
+pyusb      1.2.1
+setuptools 66.1.1
+six        1.16.0
+
+#---------------------------------------------------------
+# sudo ss -tupl
+#---------------------------------------------------------
+
+Netid                State                  Recv-Q                 Send-Q                                 Local Address:Port                                  Peer Address:Port                Process
+udp                  UNCONN                 0                      0                                            0.0.0.0:mdns                                       0.0.0.0:*                    users:(("avahi-daemon",pid=536,fd=12))
+udp                  UNCONN                 0                      0                                            0.0.0.0:54830                                      0.0.0.0:*                    users:(("avahi-daemon",pid=536,fd=14))
+udp                  UNCONN                 0                      0                                                  *:48349                                            *:*                    users:(("avahi-daemon",pid=536,fd=15))
+udp                  UNCONN                 0                      0                                                  *:mdns                                             *:*                    users:(("avahi-daemon",pid=536,fd=13))
+tcp                  LISTEN                 0                      128                                          0.0.0.0:ssh                                        0.0.0.0:*                    users:(("sshd",pid=782,fd=3))
+tcp                  LISTEN                 0                      511                                          0.0.0.0:http                                       0.0.0.0:*                    users:(("nginx",pid=1627,fd=5),("nginx",pid=1626,fd=5),("nginx",pid=1625,fd=5),("nginx",pid=1624,fd=5),("nginx",pid=1622,fd=5))
+tcp                  LISTEN                 0                      100                                          0.0.0.0:1883                                       0.0.0.0:*                    users:(("mosquitto",pid=1268,fd=8))
+tcp                  LISTEN                 0                      4096                                               *:9001                                             *:*                    users:(("mosquitto",pid=1268,fd=7))
+tcp                  LISTEN                 0                      128                                             [::]:ssh                                           [::]:*                    users:(("sshd",pid=782,fd=4))
+tcp                  LISTEN                 0                      511                                             [::]:http                                          [::]:*                    users:(("nginx",pid=1627,fd=6),("nginx",pid=1626,fd=6),("nginx",pid=1625,fd=6),("nginx",pid=1624,fd=6),("nginx",pid=1622,fd=6))
+tcp                  LISTEN                 0                      100                                             [::]:1883                                          [::]:*                    users:(("mosquitto",pid=1268,fd=9))
+
+
