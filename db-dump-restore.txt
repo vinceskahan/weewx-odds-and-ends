@@ -1,0 +1,16 @@
+A quick google for 'sqlite3 dump and restore'  returned - https://www.sqlitetutorial.net/sqlite-dump/ and https://stackoverflow.com/questions/311691/importing-a-sqlite3-dump-back-into-the-database
+
+This worked for me in minimal testing....
+
+# dump the two db to files
+echo ".dump archive" | sqlite3 /home/pi/weewx-data/archive/db1.sdb > db1.dump
+echo ".dump archive" | sqlite3 /home/pi/weewx-data/archive/db2.sdb > db2.dump
+
+# read them both into a new file
+cat db1.dump | sqlite3 newdb.sdb
+cat db2.dump | grep -v CREATE | sqlite3 newdb.sdb
+
+The differences in the read commands above are because a db dump has a command to create the archive table when it creates the new db.  You have to exclude that when you read in the dump files from the second one.
+
+If you see errors like "Runtime error near line 3: UNIQUE constraint failed: archive.dateTime (19)" you can ignore them.  All it's saying is that record already exists in the new db, which happens if you run the commands 
+
